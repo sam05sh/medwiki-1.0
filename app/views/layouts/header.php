@@ -77,11 +77,10 @@
             </a>
         </div>
         <?php if ($page != 'admin'): ?>
-        <a href=""> Definizioni </a>
-        
-        <a href=""> Casi </a>
-        
-        <a href=""> Malattie </a>
+        <div class="hidden lg:flex items-center gap-6">
+            <a href="/" class="hover:text-medical-600 transition-colors">Home</a>
+            <a href="/it/malattie" class="hover:text-medical-600 transition-colors">Malattie</a>
+        </div>
         <div class="flex items-center gap-4">
             <form action="/" method="GET" class="hidden md:block relative w-96">
                 <input type="text" name="q" placeholder="Cerca..." class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2 px-4 pl-10 focus:ring-2 focus:ring-medical-500 outline-none">
@@ -90,6 +89,15 @@
             <!-- <a href="/admin" class="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-admin-500">Admin</a> -->
         </div>
         <?php endif; ?>
+
+        <div class="pt-16 flex min-h-screen">
+            <?php if ($page != 'admin'): ?>
+                <?php include __DIR__ . '/sidebar.php'; ?> <?php endif; ?>
+            <main class="flex-1 p-4 lg:p-8">
+            <?php if(isset($_SESSION['is_admin']) && $page == 'admin'): ?>
+            <a href="/admin/logout" class="text-xs text-red-500 hover:underline">Esci dalla sezione admin</a>
+        <?php endif; ?>
+        
 		<?php if(isset($_SESSION['is_admin']) && $page == 'admin'): ?>
 			<form method="POST" class="inline"><input type="hidden" name="action" value="logout"><button class="text-xs text-red-500 hover:underline">Esci dalla sezione admin</button></form>
 		<?php endif; ?>

@@ -13,8 +13,14 @@ class HomeController extends Controller {
         
         $topMalattie = $diseaseModel->getTopDiseases(6);
 
-        // Pass data to the view
-        $this->view('layouts/header', ['page' => 'home']);
+        $db = new Database();
+        $conn = $db->connect();
+
+        $this->view('layouts/header', [
+            'page' => 'home',
+            'conn' => $conn,  // Pass the connection here
+            'currentDiseaseId' => $malattia['id'] ?? null
+        ]);
         $this->view('home', [
             'searchQuery' => $searchQuery,
             'searchResults' => $searchResults,

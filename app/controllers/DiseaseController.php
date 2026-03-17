@@ -16,10 +16,14 @@ class DiseaseController extends Controller {
         // Increment visits
         $diseaseModel->incrementVisits($malattia['id']);
 
-        // Pass data to the views
+        // In both controllers, ensure the connection is passed:
+        $db = new Database();
+        $conn = $db->connect();
+
         $this->view('layouts/header', [
-            'page' => 'malattia', 
-            'currentDiseaseId' => $malattia['id']
+            'page' => 'malattia',
+            'conn' => $conn,  // Pass the connection here
+            'currentDiseaseId' => $malattia['id'] ?? null
         ]);
         
         $this->view('malattia', ['malattia' => $malattia]);

@@ -52,17 +52,21 @@ function costruisciAlbero($pdo, $parentId = null, $activeId = null, $currentPath
 
 
 // Helper per le select (invariato)
-function getCategoryOptions($conn, $parentId = null, $prefix = '', $selectedId = null) {
-    $sql = "SELECT * FROM categorieMalattie WHERE parent_id " . ($parentId === null ? "IS NULL" : "= " . (int)$parentId);
-    $res = $conn->query($sql);
+function getCategoryOptions($pdo, $parentId = null, $prefix = '', $selectedId = null) {
+    $sql = "SELECT * FROM categorieMalattie WHERE parent_id " . ($parentId === null ? "IS NULL" : "= :parent_id");
+    $stmt = $pdo->prepare($sql);
+    if ($parentId !== null) $stmt->bindValue(':parent_id', $parentId, PDO::PARAM_INT);
+    $stmt->execute();
+
     $html = '';
-    while ($row = $res->fetch_assoc()) {
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $selected = ($row['id'] == $selectedId) ? 'selected' : '';
         $html .= '<option value="'.$row['id'].'" '.$selected.'>'.$prefix . htmlspecialchars($row['nome']).'</option>';
-        $html .= getCategoryOptions($conn, $row['id'], $prefix . '&mdash; ', $selectedId);
+        $html .= getCategoryOptions($pdo, $row['id'], $prefix . '&mdash; ', $selectedId);
     }
     return $html;
 }
+
 
 function renderDeleteButton($id) {
     ?>
@@ -95,9 +99,7 @@ function renderCategoryLevel($parentId, $level, $category_tree) {
                     echo htmlspecialchars($cat['nome']); 
                 ?>
             </span>
-
-            <form method="POST" onsubmit="return confirm('Eliminare questa categoria?');" class="flex items-center">
-                <input type="hidden" name="action" value="delete_category">
+            <form action="/admin/deleteCategory" method="POST" onsubmit="return confirm('Eliminare questa categoria?');" class="flex items-center">
                 <input type="hidden" name="cat_id" value="<?php echo (int)$cat['id']; ?>">
                 <button type="submit" class="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 w-6 h-6 rounded flex items-center justify-center transition-colors">
                     ✕
