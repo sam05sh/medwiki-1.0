@@ -18,3 +18,5 @@ $jsonDettagli = json_decode($malattia['dettagli'], true);
         <?php endforeach; endif; ?>
     </div>
 </div>
+
+
