@@ -7,7 +7,7 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=view_sidebar" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=dark_mode" />
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,12 +19,36 @@
         }
     </script>
     </head>
+
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
+    <nav class="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md h-16 flex items-center justify-between px-4 lg:px-8">
+        <div class="flex items-center gap-4">
+            <?php if(isset($_SESSION['is_admin']) && $page == 'admin'): ?>
+            <button onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')" class="p-2 text-slate-600 dark:text-slate-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <?php endif; ?>
+            <a href="/" class="text-3xl font-bold tracking-tight text-medical-700 dark:text-medical-500 flex items-center gap-2">
+                MedWiki
+            </a>
+        </div>
+        <?php if ($page != 'admin'): ?>
+        <a href=""> Definizioni </a>
+        
+        <a href=""> Casi </a>
+        
+        <a href=""> Malattie </a>
+        <div class="flex items-center gap-4">
+            <form action="/" method="GET" class="hidden md:block relative w-96">
+                <input type="text" name="q" placeholder="Cerca..." class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2 px-4 pl-10 focus:ring-2 focus:ring-medical-500 outline-none">
+            </form>
+            <button id="darkModeToggle" title="Change Theme color"><span class="material-symbols-outlined">dark_mode</span></button>
+            <!-- <a href="/admin" class="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-admin-500">Admin</a> -->
+        </div>
+        <?php endif; ?>
+		<?php if(isset($_SESSION['is_admin']) && $page == 'admin'): ?>
+			<form method="POST" class="inline"><input type="hidden" name="action" value="logout"><button class="text-xs text-red-500 hover:underline">Esci dalla sezione admin</button></form>
+		<?php endif; ?>
+    </nav>
     <div class="pt-16 flex min-h-screen">
-        <?php 
-        // Example: Include sidebar if on admin page
-        if (isset($page) && $page == 'admin') {
-            require_once '../app/views/layouts/sidebar.php';
-        }
-        ?>
-        <main class="flex-1 p-4 lg:p-8 w-full max-w-5xl mx-auto">
+
