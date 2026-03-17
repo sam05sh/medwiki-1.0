@@ -18,6 +18,50 @@
             }}}
         }
     </script>
+
+    <style>
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background-color: #475569; }
+        
+        /* Stile di base per la sidebar (espansa) */
+        #sidebar.sidebar-expanded {
+            width: 280px; /* Larghezza standard */
+            transition: width 0.3s ease, padding 0.3s ease;
+            overflow-x: hidden; /* Evita scrollbar inutili */
+        }
+
+        /* Stile per la sidebar compressa (MINIMIZZATA) */
+        #sidebar.sidebar-collapsed {
+            width: 60px; /* Larghezza minima per contenere solo l'icona */
+            padding: 15px 10px; /* Riduce il padding per stringere */
+            transition: width 0.3s ease, padding 0.3s ease;
+        }
+
+        /* Nasconde il titolo e il contenuto quando è compressa */
+        #sidebar.sidebar-collapsed #sidebarTitle,
+        #sidebar.sidebar-collapsed #sidebarContent {
+            display: none;
+        }
+
+        /* Aggiustamenti per il pulsante */
+        #sidebarToggle {
+            display: flex;
+            align-items: center;
+            /* Assicurati che il pulsante sia visibile e ben posizionato */
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        /* Stile per l'icona e il testo nel pulsante (se hai usato la struttura sopra) */
+        #sidebarToggle .material-symbols-outlined {
+            /* Stili per l'icona */
+        }
+
+    </style>
+
     </head>
 
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
