@@ -79,7 +79,7 @@
         <?php if ($page != 'admin'): ?>
         <div class="hidden lg:flex items-center gap-6">
             <a href="/" class="hover:text-medical-600 transition-colors">Home</a>
-            <a href="/it/malattie" class="hover:text-medical-600 transition-colors">Malattie</a>
+            <a href="#" onclick="document.getElementById('sidebar').classList.remove('sidebar-collapsed'); document.getElementById('sidebar').classList.add('sidebar-expanded'); return false;" class="hover:text-medical-600 transition-colors">Esplora Malattie</a>
         </div>
         <div class="flex items-center gap-4">
             <form action="/" method="GET" class="hidden md:block relative w-96">

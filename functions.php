@@ -13,6 +13,9 @@ function slugify($text) {
  * Costruisce l'albero passando il "path" accumulato dai genitori.
  * $currentPathUrl: es. "/it/cardiologia"
  */
+/**
+ * Costruisce l'albero passando il "path" accumulato dai genitori.
+ */
 function costruisciAlbero($pdo, $parentId = null, $activeId = null, $currentPathUrl = '') {
     $sql = "SELECT * FROM categorieMalattie WHERE parent_id " . ($parentId === null ? "IS NULL" : "= :parent_id") . " ORDER BY nome ASC";
     $stmt = $pdo->prepare($sql);
@@ -25,25 +28,46 @@ function costruisciAlbero($pdo, $parentId = null, $activeId = null, $currentPath
             $catSlug = !empty($row['slug']) ? $row['slug'] : slugify($row['nome']);
             $thisCatPath = $currentPathUrl . '/' . $catSlug;
 
-            // Check for children
+            // Fetch subcategories
             $checkChild = $pdo->prepare("SELECT id FROM categorieMalattie WHERE parent_id = :id");
             $checkChild->execute(['id' => $row['id']]);
-            
-            if ($checkChild->rowCount() > 0) {
-                echo '<details class="group">';
-                echo '<summary class="cursor-pointer text-sm">'.htmlspecialchars($row['nome']).'</summary>';
-                costruisciAlbero($pdo, $row['id'], $activeId, $thisCatPath);
+            $hasChildren = $checkChild->rowCount() > 0;
+
+            // Fetch diseases in this category
+            $mStmt = $pdo->prepare("SELECT id, nome, slug FROM malattie WHERE categoria_id = :id ORDER BY nome ASC");
+            $mStmt->execute(['id' => $row['id']]);
+            $diseases = $mStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Group into <details> if it contains subcategories OR diseases
+            if ($hasChildren || count($diseases) > 0) {
+                // FIXED: Added id="cat-ID" so localStorage correctly remembers accordion state
+                echo '<details class="group" id="cat-'.$row['id'].'">';
+                echo '<summary class="cursor-pointer text-sm font-medium py-1">'.htmlspecialchars($row['nome']).'</summary>';
+                
+                if ($hasChildren) {
+                    costruisciAlbero($pdo, $row['id'], $activeId, $thisCatPath);
+                }
+                
+                if (count($diseases) > 0) {
+                    echo '<ul class="pl-4 space-y-1 mt-1 border-l border-slate-100 dark:border-slate-700">';
+                    foreach($diseases as $m){
+                        $mSlug = !empty($m['slug']) ? $m['slug'] : slugify($m['nome']);
+                        $fullUrl = "/it" . $thisCatPath . "/" . $mSlug;
+                        
+                        // FIXED: Applies the active ID marker so the JS can automatically expand the tree
+                        $isActive = ($activeId == $m['id']);
+                        $idAttr = $isActive ? ' id="active-disease-link"' : '';
+                        $cssClass = $isActive ? 'text-medical-600 font-bold text-xs' : 'text-teal-600 dark:text-teal-400 text-xs hover:underline';
+                        
+                        echo '<li><a href="'.$fullUrl.'"'.$idAttr.' class="'.$cssClass.'">'.htmlspecialchars($m['nome']).'</a></li>';
+                    }
+                    echo '</ul>';
+                }
+                
                 echo '</details>';
             } else {
-                echo '<div class="font-medium text-sm">'.htmlspecialchars($row['nome']).'</div>';
-                // Fetch diseases in this category
-                $mStmt = $pdo->prepare("SELECT id, nome, slug FROM malattie WHERE categoria_id = :id");
-                $mStmt->execute(['id' => $row['id']]);
-                while($m = $mStmt->fetch(PDO::FETCH_ASSOC)){
-                    $mSlug = !empty($m['slug']) ? $m['slug'] : slugify($m['nome']);
-                    $fullUrl = "/it" . $thisCatPath . "/" . $mSlug;
-                    echo '<li><a href="'.$fullUrl.'" class="text-teal-600 text-xs">'.htmlspecialchars($m['nome']).'</a></li>';
-                }
+                // Empty category
+                echo '<div class="font-medium text-sm py-1 text-slate-400">'.htmlspecialchars($row['nome']).'</div>';
             }
         }
         echo '</ul>';
