@@ -12,10 +12,15 @@ if (file_exists(__DIR__ . '/functions.php')) {
 }
 
 /**
- * 3. Routing Logic
- * This parses the URL to decide which controller and method to run.
+ * 3. Routing Logic Avanzato
  */
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// RIMUOVE l'eventuale "htdocs" e "index.php" se il server li inietta nell'URI
+$requestUri = preg_replace('#^/htdocs/#', '/', $requestUri);
+$requestUri = str_replace('/index.php', '', $requestUri);
+
+// Suddivide l'URL in segmenti puliti
 $segments = array_values(array_filter(explode('/', trim($requestUri, '/'))));
 
 // Default destination: HomeController
@@ -45,7 +50,6 @@ if (empty($segments) || (isset($segments[0]) && $segments[0] == 'it' && count($s
 } else {
     /**
      * Disease pages (e.g., /it/category-slug/disease-slug)
-     * The slug is usually the last part of the URL.
      */
     $diseaseSlug = end($segments);
     require_once __DIR__ . '/app/controllers/DiseaseController.php';
