@@ -13,61 +13,43 @@ function slugify($text) {
  * Costruisce l'albero passando il "path" accumulato dai genitori.
  * $currentPathUrl: es. "/it/cardiologia"
  */
-function costruisciAlbero($conn, $parentId = null, $activeId = null, $currentPathUrl = '') {
-    // Se è la radice, il path base è vuoto (o solo lingua gestita altrove, ma qui lo riceviamo pulito)
-    $sql = "SELECT * FROM categorieMalattie WHERE parent_id " . ($parentId === null ? "IS NULL" : "= " . (int)$parentId) . " ORDER BY nome ASC";
-    $result = $conn->query($sql);
+function costruisciAlbero($pdo, $parentId = null, $activeId = null, $currentPathUrl = '') {
+    $sql = "SELECT * FROM categorieMalattie WHERE parent_id " . ($parentId === null ? "IS NULL" : "= :parent_id") . " ORDER BY nome ASC";
+    $stmt = $pdo->prepare($sql);
+    if ($parentId !== null) $stmt->bindValue(':parent_id', $parentId, PDO::PARAM_INT);
+    $stmt->execute();
     
-    if ($result && $result->num_rows > 0) {
-        echo '<ul class="pl-4 border-l border-slate-200 dark:border-slate-700 ml-2 space-y-1">';
-        while($row = $result->fetch_assoc()) {
-            echo '<li>';
-            
-            // Calcoliamo il path per QUESTA categoria
-            // Se lo slug è vuoto (vecchi record), usiamo slugify sul nome al volo
+    if ($stmt->rowCount() > 0) {
+        echo '<ul class="pl-4 border-l border-slate-200 ml-2 space-y-1">';
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $catSlug = !empty($row['slug']) ? $row['slug'] : slugify($row['nome']);
             $thisCatPath = $currentPathUrl . '/' . $catSlug;
 
-            $checkChild = $conn->query("SELECT id FROM categorieMalattie WHERE parent_id = " . $row['id']);
-            $hasChild = $checkChild->num_rows > 0;
-
-            if ($hasChild) {
-                echo '<details class="group" id="cat-details-'.$row['id'].'">';
-                echo '<summary class="flex justify-between items-center py-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded cursor-pointer select-none text-sm transition-colors">';
-                echo '<span>' . htmlspecialchars($row['nome']) . '</span>';
-                echo '<span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>';
-                echo '</summary>';
-                // RICORSIONE: Passiamo il path aggiornato ai figli
-                costruisciAlbero($conn, $row['id'], $activeId, $thisCatPath);
+            // Check for children
+            $checkChild = $pdo->prepare("SELECT id FROM categorieMalattie WHERE parent_id = :id");
+            $checkChild->execute(['id' => $row['id']]);
+            
+            if ($checkChild->rowCount() > 0) {
+                echo '<details class="group">';
+                echo '<summary class="cursor-pointer text-sm">'.htmlspecialchars($row['nome']).'</summary>';
+                costruisciAlbero($pdo, $row['id'], $activeId, $thisCatPath);
                 echo '</details>';
             } else {
-                // Categoria finale: stampiamo il nome e cerchiamo le malattie
-                echo '<div class="py-1 px-2 text-slate-700 dark:text-slate-200 font-medium text-sm">' . htmlspecialchars($row['nome']) . '</div>';
-                
-                $malattie = $conn->query("SELECT id, nome, slug FROM malattie WHERE categoria_id = " . $row['id']);
-                if($malattie->num_rows > 0){
-                   echo '<ul class="pl-2 mt-1">';
-                   while($m = $malattie->fetch_assoc()){
-                       $mSlug = !empty($m['slug']) ? $m['slug'] : slugify($m['nome']);
-                       // URL COMPLETO: /it + path_categorie + slug_malattia
-                       $fullUrl = "/it" . $thisCatPath . "/" . $mSlug;
-                       
-                       $isActive = ($activeId == $m['id']);
-                       $activeClass = $isActive 
-                            ? "bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 font-bold border-r-2 border-teal-500" 
-                            : "text-teal-600 dark:text-teal-400 hover:underline";
-                       $linkId = $isActive ? 'id="active-disease-link"' : '';
-
-                       echo '<li><a href="'.$fullUrl.'" '.$linkId.' class="block py-1 px-2 text-xs '.$activeClass.'">'.htmlspecialchars($m['nome']).'</a></li>';
-                   }
-                   echo '</ul>';
+                echo '<div class="font-medium text-sm">'.htmlspecialchars($row['nome']).'</div>';
+                // Fetch diseases in this category
+                $mStmt = $pdo->prepare("SELECT id, nome, slug FROM malattie WHERE categoria_id = :id");
+                $mStmt->execute(['id' => $row['id']]);
+                while($m = $mStmt->fetch(PDO::FETCH_ASSOC)){
+                    $mSlug = !empty($m['slug']) ? $m['slug'] : slugify($m['nome']);
+                    $fullUrl = "/it" . $thisCatPath . "/" . $mSlug;
+                    echo '<li><a href="'.$fullUrl.'" class="text-teal-600 text-xs">'.htmlspecialchars($m['nome']).'</a></li>';
                 }
             }
-            echo '</li>';
         }
         echo '</ul>';
     }
 }
+
 
 // Helper per le select (invariato)
 function getCategoryOptions($conn, $parentId = null, $prefix = '', $selectedId = null) {

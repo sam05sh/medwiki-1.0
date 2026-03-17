@@ -99,8 +99,13 @@
     });
 });
 
-
+        </main>
+    </div>
+    <footer class="bg-white border-t py-6 text-center text-slate-400 text-sm">
+        &copy; <?= date('Y') ?> MedWiki - Tutti i diritti riservati.
+    </footer>
 
     </script>
 </body>
 </html>
+

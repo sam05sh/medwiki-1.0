@@ -72,10 +72,8 @@ class AdminController extends Controller {
         $editDetails = [];
         
         if ($id) {
-            // Reusing getBySlug logic but by ID for the admin panel
-            $stmt = $this->model('DiseaseModel')->conn->prepare("SELECT * FROM malattie WHERE id = :id");
-            $stmt->execute(['id' => $id]);
-            $editData = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Use the new getById method instead of accessing ->conn directly
+            $editData = $diseaseModel->getById($id); 
             if ($editData) {
                 $editDetails = json_decode($editData['dettagli'], true);
             }
@@ -85,7 +83,7 @@ class AdminController extends Controller {
         $this->view('admin/edit', [
             'editData' => $editData,
             'editDetails' => $editDetails,
-            'allCats' => $categoryModel->getAllCategories() // Needed for the select dropdown
+            'allCats' => $categoryModel->getAllCategories()
         ]);
         $this->view('layouts/footer');
     }

@@ -7,6 +7,13 @@ class DiseaseModel {
         $this->conn = $db->connect();
     }
 
+    // Add this method to allow the Controller to get a single record by ID
+    public function getById($id) {
+        $stmt = $this->conn->prepare("SELECT * FROM malattie WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function searchDiseases($query) {
         $sql = "SELECT m.*, c.slug as cat_slug, c.nome as cat_nome 
                 FROM malattie m 
