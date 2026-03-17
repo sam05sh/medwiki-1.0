@@ -37,7 +37,7 @@ class AdminController extends Controller {
     public function login() {
         $login_error = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once '../app/config/database.php'; // Or store password in a config file securely
+            require_once __DIR__ . '/../app/config/database.php'; // Or store password in a config file securely
             $admin_password = 'passwordAdmin'; // Remember to hash this in production!
             
             if (isset($_POST['password']) && $_POST['password'] === $admin_password) {

@@ -1,3 +1,5 @@
+//TODO: update with new version
+
 <?php
 // 1. Start the session for admin authentication
 session_start();
