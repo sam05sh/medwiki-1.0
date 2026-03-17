@@ -2,9 +2,9 @@
     <h1 class="text-4xl lg:text-6xl font-extrabold text-slate-900 dark:text-white mb-6">
         Enciclopedia <span class="text-transparent bg-clip-text bg-gradient-to-r from-medical-500 to-blue-600">Medica</span>
     </h1>
-    
+
     <form action="/" method="GET" class="relative max-w-xl mx-auto mb-12">
-        <input type="text" name="q" value="<?= htmlspecialchars($searchQuery) ?>" placeholder="Cerca es. 'Ipertensione'..." class="...">
+        <input type="text" name="q" value="<?= htmlspecialchars($searchQuery) ?>" placeholder="Cerca es. 'Ipertensione'..." class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full py-4 px-6 shadow-sm focus:ring-2 focus:ring-medical-500 outline-none">
     </form>
 
     <?php if(!empty($searchResults)): ?>

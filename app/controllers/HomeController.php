@@ -19,7 +19,7 @@ class HomeController extends Controller {
         $this->view('layouts/header', [
             'page' => 'home',
             'conn' => $conn,  // Pass the connection here
-            'currentDiseaseId' => $malattia['id'] ?? null
+            'currentDiseaseId' => null
         ]);
         $this->view('home', [
             'searchQuery' => $searchQuery,

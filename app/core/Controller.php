@@ -9,11 +9,10 @@ class Controller {
     // Helper to load a view and pass data to it
     public function view($view, $data = []) {
         if (file_exists(__DIR__ . '/../views/' . $view . '.php')) {
-            // Extract array keys into variables (e.g., $data['malattie'] becomes $malattie)
             extract($data); 
-            require_once __DIR__ . '/../views/' . $view . '.php';
+            require __DIR__ . '/../views/' . $view . '.php'; // Fixed: changed require_once to require
         } else {
-            die("View does not exist.");
+            die("View does not exist: " . $view);
         }
     }
 }

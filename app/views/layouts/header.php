@@ -86,21 +86,16 @@
                 <input type="text" name="q" placeholder="Cerca..." class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2 px-4 pl-10 focus:ring-2 focus:ring-medical-500 outline-none">
             </form>
             <button id="darkModeToggle" title="Change Theme color"><span class="material-symbols-outlined">dark_mode</span></button>
-            <!-- <a href="/admin" class="p-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-admin-500">Admin</a> -->
         </div>
         <?php endif; ?>
-
-        <div class="pt-16 flex min-h-screen">
-            <?php if ($page != 'admin'): ?>
-                <?php include __DIR__ . '/sidebar.php'; ?> <?php endif; ?>
-            <main class="flex-1 p-4 lg:p-8">
-            <?php if(isset($_SESSION['is_admin']) && $page == 'admin'): ?>
-            <a href="/admin/logout" class="text-xs text-red-500 hover:underline">Esci dalla sezione admin</a>
+    </nav> <div class="pt-16 flex min-h-screen">
+        <?php if ($page != 'admin'): ?>
+            <?php include __DIR__ . '/sidebar.php'; ?> 
         <?php endif; ?>
         
-		<?php if(isset($_SESSION['is_admin']) && $page == 'admin'): ?>
-			<form method="POST" class="inline"><input type="hidden" name="action" value="logout"><button class="text-xs text-red-500 hover:underline">Esci dalla sezione admin</button></form>
-		<?php endif; ?>
-    </nav>
-    <div class="pt-16 flex min-h-screen">
-
+        <main class="flex-1 p-4 lg:p-8">
+            <?php if(isset($_SESSION['is_admin']) && $page == 'admin'): ?>
+                <div class="mb-4">
+                    <a href="/admin/logout" class="text-xs text-red-500 hover:underline">Esci dalla sezione admin</a>
+                </div>
+            <?php endif; ?>

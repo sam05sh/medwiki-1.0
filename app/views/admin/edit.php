@@ -2,7 +2,7 @@
     <h1 class="text-2xl font-bold mb-6"><?= $editData ? 'Modifica' : 'Aggiungi' ?> Malattia</h1>
     
     <form action="/admin/saveDisease" method="POST" class="space-y-4">
-        <input type="hidden" name="id" value="<?= $editData['id'] ?? '' ?>">
+        <input type="hidden" name="id" value="<?= isset($editData['id']) ? $editData['id'] : '' ?>">
         
         <div>
             <label class="block text-sm font-medium text-gray-700">Nome Malattia</label>
