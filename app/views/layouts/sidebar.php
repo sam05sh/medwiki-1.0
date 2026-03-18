@@ -1,4 +1,4 @@
-<aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 transform -translate-x-full lg:translate-x-0 lg:static lg:block transition-transform duration-300 ease-in-out pt-16 lg:pt-0 overflow-y-auto custom-scroll shadow-2xl lg:shadow-none">
+<aside id="sidebar" class="hidden fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 transform -translate-x-full lg:translate-x-0 lg:static lg:block transition-transform duration-300 ease-in-out pt-16 lg:pt-0 overflow-y-auto custom-scroll shadow-2xl lg:shadow-none">
     
     <div class="p-6">
         <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">Indice Categorie</h3>
