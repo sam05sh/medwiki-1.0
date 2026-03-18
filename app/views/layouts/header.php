@@ -76,7 +76,7 @@
     </nav>
 
     <div class="flex-1 flex max-w-7xl mx-auto w-full">
-        <?php if ($page != 'admin'): ?>
+        <?php if ($page == 'admin'): ?>
             <?php include __DIR__ . '/sidebar.php'; ?> 
         <?php endif; ?>
         
