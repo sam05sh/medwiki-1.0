@@ -1,113 +1,107 @@
 </main>
-        </div> <footer class="bg-white border-t py-6 text-center text-slate-400 text-sm">
-            &copy; <?= date('Y') ?> MedWiki - Tutti i diritti riservati.
-        </footer>
+    </div> <footer class="bg-white dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                &copy; <?= date('Y') ?> MedWiki. Tutti i diritti riservati.
+            </p>
+            <p class="text-slate-400 dark:text-slate-500 text-xs mt-2">
+                Progetto open source dedicato all'educazione medica.
+            </p>
+        </div>
+    </footer>
 
-        <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    const sidebar = document.getElementById('sidebar');
-                    const storageKey = 'medwiki_tree_state';
-                    const scrollKey = 'medwiki_sidebar_scroll';
-                        document.addEventListener("DOMContentLoaded", () => {
-                const sidebar = document.getElementById('sidebar');
-                const storageKey = 'medwiki_tree_state';
-                const scrollKey = 'medwiki_sidebar_scroll';
-
-                // Ripristina stato apertura
-                const savedState = JSON.parse(localStorage.getItem(storageKey) || "[]");
-                savedState.forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.open = true;
-                });
-
-                // Auto-expand per malattia attiva
-                const activeLink = document.getElementById('active-disease-link');
-                if (activeLink) {
-                    let parent = activeLink.closest('details');
-                    while (parent) {
-                        parent.open = true;
-                        if (!savedState.includes(parent.id)) savedState.push(parent.id);
-                        parent = parent.parentElement.closest('details');
-                    }
-                    localStorage.setItem(storageKey, JSON.stringify(savedState));
-                }
-
-                // Ripristina scroll
-                const savedScroll = localStorage.getItem(scrollKey);
-                if(sidebar && savedScroll) sidebar.scrollTop = parseInt(savedScroll);
-
-                // Salva stato al click
-                document.querySelectorAll('details').forEach(detail => {
-                    detail.addEventListener('toggle', () => {
-                        let currentState = JSON.parse(localStorage.getItem(storageKey) || "[]");
-                        if(detail.open) {
-                            if(!currentState.includes(detail.id)) currentState.push(detail.id);
-                        } else {
-                            currentState = currentState.filter(id => id !== detail.id);
-                        }
-                        localStorage.setItem(storageKey, JSON.stringify(currentState));
-                    });
-                });
-
-                // Salva scroll
-                if(sidebar) {
-                    sidebar.addEventListener('scroll', () => {
-                        localStorage.setItem(scrollKey, sidebar.scrollTop);
-                    });
-                }
-            });
-
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // --- 1. Theme Toggle Logic ---
             const htmlEl = document.documentElement; 
-            const toggleButton = document.getElementById('darkModeToggle');
+            const themeBtn = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
 
-            // --- Persistence Check (on page load) ---
-            // Check local storage for the saved theme
+            function updateThemeIcon() {
+                if(!themeIcon) return;
+                themeIcon.textContent = htmlEl.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+            }
+
             if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 htmlEl.classList.add('dark');
             } else {
                 htmlEl.classList.remove('dark');
             }
+            updateThemeIcon();
 
-            // --- Toggle Logic (on button click) ---
-            toggleButton.addEventListener('click', () => {
-                if (htmlEl.classList.contains('dark')) {
-                    // Switch to light mode
-                    htmlEl.classList.remove('dark');
-                    localStorage.theme = 'light';
-                } else {
-                    // Switch to dark mode
-                    htmlEl.classList.add('dark');
-                    localStorage.theme = 'dark';
-                }
-            });
-            
-            document.addEventListener('DOMContentLoaded', function() {
+            if(themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    htmlEl.classList.toggle('dark');
+                    localStorage.theme = htmlEl.classList.contains('dark') ? 'dark' : 'light';
+                    updateThemeIcon();
+                });
+            }
+
+            // --- 2. Sidebar & Mobile Menu Logic ---
             const sidebar = document.getElementById('sidebar');
-            const toggleButton = document.getElementById('sidebarToggle');
-            
-            // Aggiunge un listener di evento al click del pulsante
-            toggleButton.addEventListener('click', function() {
-                // Controlla se la sidebar ha la classe 'sidebar-expanded'
-                if (sidebar.classList.contains('sidebar-expanded')) {
-                    // Se è espansa, la comprime
-                    sidebar.classList.remove('sidebar-expanded');
-                    sidebar.classList.add('sidebar-collapsed');
-                    
+            const overlay = document.getElementById('sidebarOverlay');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const desktopToggleBtn = document.getElementById('desktopSidebarToggle');
+
+            function toggleMobileSidebar() {
+                if(!sidebar || !overlay) return;
+                const isClosed = sidebar.classList.contains('-translate-x-full');
+                if (isClosed) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
                 } else {
-                    // Se è compressa, la espande
-                    sidebar.classList.remove('sidebar-collapsed');
-                    sidebar.classList.add('sidebar-expanded');
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
                 }
-                
-                // OPZIONALE: Puoi cambiare l'icona del pulsante
-                const icon = toggleButton.querySelector('.material-symbols-outlined');
-                if (icon) {
-                    // Qua volendo si può cambiare il secondo view_sidebar con altra icona
-                    icon.textContent = sidebar.classList.contains('sidebar-expanded') ? 'view_sidebar' : 'view_sidebar';
+            }
+
+            if(mobileBtn) mobileBtn.addEventListener('click', toggleMobileSidebar);
+            if(overlay) overlay.addEventListener('click', toggleMobileSidebar);
+            
+            // Desktop toggle (collapses sideways)
+            if(desktopToggleBtn && sidebar) {
+                desktopToggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('lg:hidden');
+                });
+            }
+
+            // --- 3. Tree Navigation Persistence ---
+            const storageKey = 'medwiki_tree_state';
+            const savedState = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            
+            // Restore Open States
+            savedState.forEach(id => {
+                const el = document.getElementById(id);
+                if(el && el.tagName === 'DETAILS') el.open = true;
+            });
+
+            // Auto-expand Active Disease
+            const activeLink = document.getElementById('active-disease-link');
+            if (activeLink) {
+                let parent = activeLink.closest('details');
+                while (parent) {
+                    parent.open = true;
+                    if (!savedState.includes(parent.id)) savedState.push(parent.id);
+                    parent = parent.parentElement.closest('details');
                 }
+                localStorage.setItem(storageKey, JSON.stringify(savedState));
+                // Scroll into view gently
+                activeLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // Listen to tree toggles
+            document.querySelectorAll('details').forEach(detail => {
+                detail.addEventListener('toggle', () => {
+                    let currentState = JSON.parse(localStorage.getItem(storageKey) || "[]");
+                    if(detail.open && detail.id) {
+                        if(!currentState.includes(detail.id)) currentState.push(detail.id);
+                    } else if (!detail.open && detail.id) {
+                        currentState = currentState.filter(id => id !== detail.id);
+                    }
+                    localStorage.setItem(storageKey, JSON.stringify(currentState));
+                });
             });
         });
-        });
-        </script>
-    </body>
+    </script>
+</body>
 </html>

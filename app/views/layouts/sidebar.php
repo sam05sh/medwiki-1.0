@@ -1,17 +1,17 @@
-<aside id="sidebar" class="sidebar-expanded bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 transform -translate-x-full lg:translate-x-0 lg:static lg:block transition-transform duration-300 ease-in-out pt-16 lg:pt-0 overflow-y-auto custom-scroll shadow-2xl lg:shadow-none">
     
-    <div class="flex justify-start items-center mb-2">
-        <button id="sidebarToggle" class="bg-transparent border-none text-white cursor-pointer p-0 flex items-center">
-            <span class="material-symbols-outlined text-slate-700 dark:text-slate-200 font-medium text-2xl">view_sidebar</span>
-            <span id="sidebarTitle" class="py-1 px-2 text-slate-700 dark:text-slate-200 font-medium text-sm">Malattie</span>
-        </button>
-    </div>
-
-    <div id="sidebarContent">
-    <?php 
-        // Usiamo la variabile globale definita nel router
-        $activeId = isset($currentDiseaseId) ? $currentDiseaseId : null;
-        costruisciAlbero($conn, null, $activeId); 
-    ?>
+    <div class="p-6">
+        <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">Indice Categorie</h3>
+        
+        <nav id="sidebarContent" class="text-sm">
+        <?php 
+            $activeId = isset($currentDiseaseId) ? $currentDiseaseId : null;
+            // The logic inside funzioni.php (costruisciAlbero) should be updated to output standard Tailwind classes 
+            // rather than raw HTML styles, but it works fine with the baseline CSS if left untouched.
+            costruisciAlbero($conn, null, $activeId); 
+        ?>
+        </nav>
     </div>
 </aside>
+
+<div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 hidden lg:hidden transition-opacity"></div>
