@@ -15,7 +15,6 @@ class AdminController extends Controller {
         $diseaseModel = $this->model('DiseaseModel');
         $categoryModel = $this->model('CategoryModel');
 
-        // Note: You'll need to add an getAllDiseases() method to your DiseaseModel!
         $allMalattie = $diseaseModel->getAllDiseases(); 
         $allCats = $categoryModel->getAllCategories();
 
@@ -25,7 +24,14 @@ class AdminController extends Controller {
             $category_tree[$parentId][] = $cat;
         }
 
-        $this->view('layouts/header', ['page' => 'admin']);
+        // Inizializza la connessione per la sidebar
+        $db = new Database();
+        $conn = $db->connect();
+
+        $this->view('layouts/header', [
+            'page' => 'admin',
+            'conn' => $conn // Passa la connessione qui
+        ]);
         $this->view('admin/dashboard', [
             'allMalattie' => $allMalattie,
             'category_tree' => $category_tree,
@@ -38,7 +44,6 @@ class AdminController extends Controller {
     public function login() {
         $login_error = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Fix: Removed broken require_once here.
             $admin_password = 'passwordAdmin'; 
             
             if (isset($_POST['password']) && $_POST['password'] === $admin_password) {
@@ -50,7 +55,14 @@ class AdminController extends Controller {
             }
         }
 
-        $this->view('layouts/header', ['page' => 'admin']);
+        // Inizializza la connessione per la sidebar
+        $db = new Database();
+        $conn = $db->connect();
+
+        $this->view('layouts/header', [
+            'page' => 'admin', 
+            'conn' => $conn // Passa la connessione qui
+        ]);
         $this->view('admin/login', ['login_error' => $login_error]);
         $this->view('layouts/footer');
     }
@@ -73,14 +85,20 @@ class AdminController extends Controller {
         $editDetails = [];
         
         if ($id) {
-            // Use the new getById method instead of accessing ->conn directly
             $editData = $diseaseModel->getById($id); 
             if ($editData) {
                 $editDetails = json_decode($editData['dettagli'], true);
             }
         }
 
-        $this->view('layouts/header', ['page' => 'admin']);
+        // Inizializza la connessione per la sidebar
+        $db = new Database();
+        $conn = $db->connect();
+
+        $this->view('layouts/header', [
+            'page' => 'admin',
+            'conn' => $conn // Passa la connessione qui
+        ]);
         $this->view('admin/edit', [
             'editData' => $editData,
             'editDetails' => $editDetails,
